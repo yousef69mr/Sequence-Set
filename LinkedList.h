@@ -18,6 +18,8 @@ private:
 
     node<K,T> *head;
     node<K,T> *tail;
+    int numberOfBlocks;
+    int numberOfRecordsInEachBlock;
     node<K,T> *temp;
     int byteOffSet;
     int numoflists = 0;
@@ -38,7 +40,13 @@ public:
         }
     }
 
+    void setNumberOfRecordsInEachBlock(int numberOfRecordsInEachBlock){
+        this->numberOfRecordsInEachBlock=numberOfRecordsInEachBlock;
+    }
 
+    void setNumberOfBlocks(int NumberOfBlocks){
+        this->numberOfBlocks=NumberOfBlocks;
+    }
 
     ~LinkedList() {
         node<K,T> *P = head;
@@ -266,6 +274,25 @@ public:
         return NULL;
 
     }
+
+    int getNumberOfRecords(int blockNumber){
+
+        int counter=0;
+
+        node<K,T> *temp = new node<K,T>;
+        temp = head;
+        while (temp != NULL) {
+            //cout<<temp->getitem()<<" ";
+            if (temp->getBlockNumber() == blockNumber) {
+                counter++;
+            }
+
+            temp = temp->getNext();
+
+        }
+        return counter;
+    }
+
 
     int getByteOffSet(){
         return byteOffSet;

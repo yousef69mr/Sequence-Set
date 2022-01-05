@@ -1,7 +1,7 @@
 //
 // Created by LENOVO on 1/4/2022.
 //
-
+#include <iostream>
 #ifndef LINKEDLIST_NODE_H
 #define LINKEDLIST_NODE_H
 
@@ -10,6 +10,7 @@ class node {
 private:
     T item;
     K key;
+    int blockNumber;
     int index;
     int size;
     int byteOffset;
@@ -28,6 +29,14 @@ public:
         item = newItem;
         next = nullptr;
 
+    }
+
+    void setBlockNumber(int num){
+        blockNumber=num;
+    }
+
+    int getBlockNumber(){
+        return blockNumber;
     }
 
     void setItem(T newItem) {

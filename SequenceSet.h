@@ -3,7 +3,6 @@
 //
 
 
-#include "LinkedList.h"
 #include "Block.h"
 
 
@@ -14,8 +13,9 @@ private:
     int lastBit;
     char* fileName;
     Block<K,T>** blocks;
-    LinkedList<K,T> Records;
-    LinkedList<K,T> HeaderList;
+    int numberOfBlocks;
+    int numberOfRecordsInEachBlock;
+
 
 public:
 
@@ -23,8 +23,7 @@ public:
 
         if(createRecordFile(fileName,m,n)) {
             this->fileName=fileName;
-            HeaderList.insertLast(-1, -1);
-            Records.insertLast(-1, -1);
+
         }
 
     }
@@ -41,9 +40,19 @@ public:
 
             blocks=new Block<K,T>*[m];
             blocks[0]=new Block<K,T>();
+
             for(int i=1;i<m;i++){
                 blocks[i]=new Block<K,T>(n);
             }
+
+            //firstBlock.iKey=-1;
+            //firstBlock.iVal=-1;
+
+            numberOfBlocks=m;
+            numberOfRecordsInEachBlock=n;
+
+           // Records.setNumberOfBlocks(numberOfBlocks);
+           // Records.setNumberOfRecordsInEachBlock(n);
 
             return true;
 
@@ -56,28 +65,7 @@ public:
 
     }
 
-    void insertToFile(K key , T element){
-        fstream file;
-
-        lastBit=Records.getByteOffSet();
-        file.seekp(lastBit,ios::beg);
-        Records.remove(-1);
-        Records.insertLast(key,element);
-        Records.insertLast(-1,-1);
-        node<K,T>* temp =Records.getNode(key);
-
-       //int position = file.tellp();
-        string buffer=to_string(temp->getItem())+'|';
-        file.open(fileName,ios::out|ios::app);
-        file<<buffer;
-
-       // file.write((char*)&buffer, temp->getBytOffSet());
-        //position = file.tellp();
-       // file.write("|",1);
-        //position = file.tellp();
-        //file.write((char*)temp->getItem(),temp->getBytOffSet());
-        file.close();
-    }
+/*
 
     void readFromFile(K key){
         node<K,T>* temp =Records.getNode(key);
@@ -99,33 +87,141 @@ public:
 
     }
 
-    void DeleteRecord(K key){
-        node<K,T>* temp =Records.getNode(key);
-        if(temp!=NULL) {
+*/
 
-            HeaderList.remove(-1);
-            HeaderList.insertLast(temp->getKey(),temp->getItem());
-            HeaderList.insertLast(-1,-1);
-            //Records.getNode(key)->setKey(-1);
-            Records.remove(key);
+    void insertToFile(K key , T element){
+        fstream file;
 
-        }else{
-            cout<<"key : "+ to_string(key)+" doesn't exist\n";
+        string buffer=to_string(key)+','+to_string(element)+'|';
+        file.open(fileName,ios::out|ios::app);
+        file<<buffer;
+
+
+        file.close();
+    }
+
+    void writeSetToFile(){
+        for(int j=0;j<numberOfBlocks;j++) {
+            //cout<<"Block ("+ to_string(j)+") :"<<endl;
+            if(j==0){
+                //cout << "Record Key : " + to_string(blocks[j]->getKey(0)) + " / Record Value : " + to_string(blocks[j]->getVal(0)) << endl;
+                insertToFile(blocks[j]->getKey(0),blocks[j]->getVal(0));
+            }else {
+                for (int i = 0; i < numberOfRecordsInEachBlock; i++) {
+                   // cout << "Record Key : " + to_string(blocks[j]->getKey(i)) + " / Record Value : " + to_string(blocks[j]->getVal(i)) << endl;
+                    insertToFile(blocks[j]->getKey(i),blocks[j]->getVal(i));
+                }
+            }
+        }
+        fstream file;
+        file.open(fileName,ios::out|ios::app);
+        file<<"\n";
+        file.close();
+    }
+    int InsertVal( int iToken, int iKey){
+        for(int i=1;i<numberOfBlocks;i++){
+            if(blocks[i]->isValid()){
+                blocks[i]->add(iKey,iToken);
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    int getKey( int iBlock, int iRecord){
+        int key =blocks[iBlock]->getKey(iRecord);
+        if(key!=NULL){
+            return key;
+        }
+        else{
+            return -1;
         }
     }
-    void DisplayHeaderList(){
-        HeaderList.printList();
-    }
-    void DisplayRecords(){
-        Records.printList();
-    }
-    node<K,T> getHeaderList(){
-        return HeaderList;
+
+    int getVal( int iBlock, int iRecord){
+        int value =blocks[iBlock]->getVal(iRecord);
+        if(value!=NULL){
+            return value;
+        }
+        else{
+            return -1;
+        }
     }
 
-    node<K,T> getRecordsList(){
-        return Records;
+    int GetBlockIndex(int iToken){
+        for(int i=1;i<numberOfBlocks;i++){
+            for(int j=0;j<numberOfRecordsInEachBlock;j++){
+                int key =blocks[i]->getKey(j);
+                if(key==iToken){
+                    return i;
+                }
+            }
+
+        }
+        return -1;
+
     }
+
+    int GetRecordIndex(int iToken){
+        for(int i=1;i<numberOfBlocks;i++){
+            for(int j=0;j<numberOfRecordsInEachBlock;j++){
+                int key =blocks[i]->getKey(j);
+                if(key==iToken){
+                    return j;
+                }
+            }
+
+        }
+        return -1;
+
+    }
+
+   void DeleteKey(int iToken){
+
+       for(int i=1;i<numberOfBlocks;i++){
+           for(int j=0;j<numberOfRecordsInEachBlock;j++){
+               int key =blocks[i]->getKey(j);
+               if(key==iToken){
+                   blocks[i]->deleteRecord(iToken);
+               }
+           }
+
+       }
+    }
+
+
+    int FirstEmptyBlock(){
+        for(int i=1;i<numberOfBlocks;i++){
+
+            int key =blocks[i]->getKey(1);
+            if(key==NULL){
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    void DisplayBlockRecords(int iBlock){
+        for(int i=0;i<numberOfRecordsInEachBlock;i++){
+            cout<<"Record Key : "+ to_string(blocks[iBlock]->getKey(i))+" / Record Value : "+ to_string(blocks[iBlock]->getVal(i))<<endl;
+        }
+    }
+
+    void DisplayAllBlockRecords(){
+        for(int j=0;j<numberOfBlocks;j++) {
+            cout<<"Block ("+ to_string(j)+") :"<<endl;
+            if(j==0){
+                cout << "Record Key : " + to_string(blocks[j]->getKey(0)) + " / Record Value : " + to_string(blocks[j]->getVal(0)) << endl;
+            }else {
+                for (int i = 0; i < numberOfRecordsInEachBlock; i++) {
+                    cout << "Record Key : " + to_string(blocks[j]->getKey(i)) + " / Record Value : " + to_string(blocks[j]->getVal(i)) << endl;
+                }
+            }
+        }
+    }
+
 };
 
 

@@ -1,18 +1,26 @@
 #include <iostream>
-//#include "LinkedList.h"
+using namespace std;
+
 #include "SequenceSet.h"
 int main() {
 
     SequenceSet<int ,int> set("data.txt",4,5);
-    set.insertToFile(5,451);
-    set.readFromFile(5);
-    set.insertToFile(2,30);
-    set.readFromFile(2);
-    set.DeleteRecord(5);
-    set.insertToFile(1,11);
-    set.readFromFile(1);
-    set.DisplayRecords();
-    set.DisplayHeaderList();
+
+    set.InsertVal(1,1);
+    set.InsertVal(2,2);
+    set.InsertVal(3,3);
+    set.InsertVal(4,4);
+    set.InsertVal(5,5);
+    set.InsertVal(6,6);
+    set.InsertVal(8,8);
+    set.InsertVal(8,7);
+
+    set.DisplayAllBlockRecords();
+    set.writeSetToFile();
+    set.DeleteKey(6);
+    set.DeleteKey(4);
+    set.DisplayAllBlockRecords();
+
     cout<<"Done";
 
 
