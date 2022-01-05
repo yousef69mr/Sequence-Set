@@ -10,7 +10,7 @@ template<class K,class T>
 class SequenceSet {
 
 private:
-    int lastBit;
+    //int lastBit;
     char* fileName;
     Block<K,T>** blocks;
     int numberOfBlocks;
@@ -146,6 +146,8 @@ public:
         for(int i=1;i<numberOfBlocks;i++){
             if(blocks[i]->isValid()){
                 blocks[i]->add(iKey,iToken);
+                blocks[i-1]->setKey(i);
+                blocks[0]->setValue(FirstEmptyBlock());
                 return i;
             }
         }
@@ -201,6 +203,19 @@ public:
 
     }
 
+    void combineWithPrevious(int deletedBlock,int records){
+        for(int i=records;i>1;i--) {
+            if (blocks[deletedBlock - 1]->isValid()) {
+                blocks[deletedBlock-1]->add(blocks[deletedBlock]->getKey(i),blocks[deletedBlock]->getVal(i));
+                blocks[deletedBlock]->deleteRecord(blocks[deletedBlock]->getKey(i));
+            }else if(i<records && i!=0){
+                cout<<"Can't fully combined";
+            }else{
+                cout<<"Previous block is full";
+            }
+        }
+    }
+
    void DeleteKey(int iToken){
 
        for(int i=1;i<numberOfBlocks;i++){
@@ -208,10 +223,14 @@ public:
                int key =blocks[i]->getKey(j);
                if(key==iToken){
                    blocks[i]->deleteRecord(iToken);
+                   if(i>1 && blocks[i]->getCurrentNumberOfRecords()<(numberOfBlocks/2)){
+                       combineWithPrevious(i,blocks[i]->getCurrentNumberOfRecords());
+                   }
                }
            }
 
        }
+       writeSetToFile();
     }
 
 

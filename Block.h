@@ -10,7 +10,7 @@
 struct Record{
     int iKey;
     int iVal;
-    int byteOffset;
+
 };
 
 template<class K,class T>
@@ -32,6 +32,14 @@ public:
         fillArray();
         records[0].iKey=-1;
         records[0].iVal= -1;
+    }
+
+    void setKey(int index){
+        records[0].iKey=index;
+    }
+
+    void setValue(int index){
+        records[0].iVal=index;
     }
 
     void fillArray(){
@@ -60,16 +68,42 @@ public:
     int getNumberOfRecords(){
         return numberOfRecords;
     }
+    void swap(Record* af, Record* bf){
 
-    void sort(){
-        Record temp;
-        for(int i=0;i<numberOfRecords;i++){
-            if(records[i].iKey>records[i+1].iKey){
-                temp = records[i];
-                records[i]=records[i+1];
-                records[i+1]=temp;
+        Record t = *af;
+        *af = *bf;
+        *bf = t;
+    }
+
+    void sort(Record* &array){
+
+        int size =sizeof (array)/sizeof (array[0]);
+        for(int i=0;i<size+1;i++){
+            if(array[i].iKey>array[i+1].iKey){
+                swap(&array[i],&array[i+1]);
             }
         }
+    }
+
+    void arrSort(int* pDonate[], int s)
+    {
+        bool swap;
+        int* temp;
+        do
+        {
+            swap = false;
+            for (int count = 0; count < (s-1); count++)
+            {
+                if ((*pDonate[count]) > (*pDonate[count+1]))
+                {
+                    temp = pDonate[count];
+                    pDonate[count] = pDonate[count+1];
+                    pDonate[count+1] = temp;
+                }
+                swap = true;
+            }
+        }
+        while(swap);
     }
 
     bool isValid(){
@@ -86,15 +120,21 @@ public:
             records[1].iKey=key;
             records[1].iVal=value;
             records[0].iVal= records[1].iKey;
+            cout<<"Added Successfully\n";
         }else{
+
 
             if(getNumberOfRecords()>getCurrentNumberOfRecords()){
                 records[getCurrentNumberOfRecords()].iKey=key;
                 records[getCurrentNumberOfRecords()].iVal=value;
+                sort(records);
+                //arrSort(records,numberOfRecords);
                 records[0].iVal= records[getCurrentNumberOfRecords()].iKey;
+                cout<<"Added Successfully\n";
             }
 
-            sort();
+            sort(records);
+            records[0].iVal= records[getCurrentNumberOfRecords()].iKey;
         }
     }
 
@@ -121,23 +161,13 @@ public:
                 }
                 records[i].iKey=NULL;
                 records[i].iVal=NULL;
+                setCurrentNumberOfRecords();
+                cout<<"Deleted Successfully\n";
             }
         }
 
     }
 
-
-
-/*
-    int getKey(int value){
-        for(int i =0;i<numberOfRecords;i++){
-            if(records[i].iVal==value){
-                return records[i].iKey;
-            }
-        }
-        return NULL;
-    }
-*/
 };
 
 
