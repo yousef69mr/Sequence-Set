@@ -7,24 +7,30 @@
 
 #include "node.h"
 
+struct Record{
+    int iKey;
+    int iVal;
+};
+
 template<class K,class T>
 class Block {
 private:
-    node<K,T>* records;
+    Record* records;
 public:
 
     Block(){
-        records=new node<K,T>[1];
-        records[0].setKey(-1);
+        records=new Record[1];
+        records[0].iKey=-1;
+        records[0].iVal=-1;
     }
     Block(int numberOfRecords){
-        records=new node<K,T>[numberOfRecords];
-        records[0].setKey(-1);
+        records=new Record[numberOfRecords];
+        records[0].iKey=-1;
     }
 
     void setNumberOfRecords(int numberOfRecords){
         records=new node<K,T>[numberOfRecords];
-        records[0].setKey(-1);
+        records[0].iKey=-1;
     }
 
 };
