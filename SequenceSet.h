@@ -89,10 +89,17 @@ public:
 
 */
 
-    void insertToFile(K key , T element){
+    void insertToFile(K key , T element,int endOfBlock,int endOfSet){
         fstream file;
 
         string buffer=to_string(key)+','+to_string(element)+'|';
+        if(endOfBlock&&!endOfSet){
+            buffer+='\t';
+        }
+        if(endOfSet){
+            buffer+='\n';
+        }
+
         file.open(fileName,ios::out|ios::app);
         file<<buffer;
 
@@ -101,22 +108,39 @@ public:
     }
 
     void writeSetToFile(){
+
+        bool end= false;
+        bool endOfSet=false;
+
+
         for(int j=0;j<numberOfBlocks;j++) {
             //cout<<"Block ("+ to_string(j)+") :"<<endl;
             if(j==0){
+                end= true;
                 //cout << "Record Key : " + to_string(blocks[j]->getKey(0)) + " / Record Value : " + to_string(blocks[j]->getVal(0)) << endl;
-                insertToFile(blocks[j]->getKey(0),blocks[j]->getVal(0));
+                insertToFile(blocks[j]->getKey(0),blocks[j]->getVal(0),end,endOfSet);
+                end=false;
+
+
             }else {
                 for (int i = 0; i < numberOfRecordsInEachBlock; i++) {
                    // cout << "Record Key : " + to_string(blocks[j]->getKey(i)) + " / Record Value : " + to_string(blocks[j]->getVal(i)) << endl;
-                    insertToFile(blocks[j]->getKey(i),blocks[j]->getVal(i));
+
+                    insertToFile(blocks[j]->getKey(i),blocks[j]->getVal(i),end,endOfSet);
+                    end = false;
+                    if(i+1==numberOfBlocks){
+                        end= true;
+                        if(j==numberOfBlocks-1) {
+                            endOfSet = true;
+                        }
+                    }
+
                 }
+
             }
+
         }
-        fstream file;
-        file.open(fileName,ios::out|ios::app);
-        file<<"\n";
-        file.close();
+
     }
     int InsertVal( int iToken, int iKey){
         for(int i=1;i<numberOfBlocks;i++){

@@ -17,6 +17,7 @@ int main() {
 
     set.DisplayAllBlockRecords();
     set.writeSetToFile();
+    set.writeSetToFile();
     set.DeleteKey(6);
     set.DeleteKey(4);
     set.DisplayAllBlockRecords();
