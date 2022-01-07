@@ -9,7 +9,7 @@ int main() {
         int key,value,blockNumber,recordNumber,result;
         bool isRunning=true;
 
-
+/*
         set.InsertVal(5,1);
         set.InsertVal(18,4);
         set.InsertVal(27,5);
@@ -26,7 +26,7 @@ int main() {
         //set.InsertVal(5,11);
         //set.InsertVal(6,12);
         //set.InsertVal(8,14);
-
+*/
 
         while(isRunning) {
             cout << "//**********************//\n";
