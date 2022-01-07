@@ -97,7 +97,9 @@ public:
             buffer+='\t';
         }
         if(endOfSet){
-            buffer+='\n';
+            buffer=buffer.substr(0,buffer.size()-1);
+            buffer+="$\n";
+            cout<<"Set added to file successfully\n";
         }
 
         file.open(fileName,ios::out|ios::app);
@@ -123,17 +125,22 @@ public:
 
 
             }else {
+
+                end= false;
+
                 for (int i = 0; i < numberOfRecordsInEachBlock; i++) {
                    // cout << "Record Key : " + to_string(blocks[j]->getKey(i)) + " / Record Value : " + to_string(blocks[j]->getVal(i)) << endl;
+                    if(j+1==numberOfBlocks &&i+1==numberOfRecordsInEachBlock) {
+                        endOfSet = true;
+                    }
+
+                    if(i+1==numberOfRecordsInEachBlock){
+                        end= true;
+                    }
 
                     insertToFile(blocks[j]->getKey(i),blocks[j]->getVal(i),end,endOfSet);
-                    end = false;
-                    if(i+1==numberOfBlocks){
-                        end= true;
-                        if(j==numberOfBlocks-1) {
-                            endOfSet = true;
-                        }
-                    }
+
+
 
                 }
 
@@ -152,6 +159,7 @@ public:
             }
         }
 
+        cout<<"There is no empty record\n";
         return -1;
     }
 
@@ -203,15 +211,27 @@ public:
 
     }
 
-    void combineWithPrevious(int deletedBlock,int records){
-        for(int i=records;i>1;i--) {
+    void combineWithPrevious(int deletedBlock,int numOfRecords){
+        for(int i=1,j=0;i<numberOfRecordsInEachBlock&&j<numOfRecords;i++,j++) {
             if (blocks[deletedBlock - 1]->isValid()) {
                 blocks[deletedBlock-1]->add(blocks[deletedBlock]->getKey(i),blocks[deletedBlock]->getVal(i));
                 blocks[deletedBlock]->deleteRecord(blocks[deletedBlock]->getKey(i));
-            }else if(i<records && i!=0){
+            }else if(i<numOfRecords && i!=0){
                 cout<<"Can't fully combined";
             }else{
                 cout<<"Previous block is full";
+            }
+        }
+    }
+
+
+    void split(int deletedBlock,int numOfRecords){
+        for(int i=1,j=0;i<numberOfRecordsInEachBlock&&j<numOfRecords;i++,j++) {
+            if (blocks[deletedBlock]->isValid()&&!blocks[deletedBlock-1]->islessThanHalf()) {
+                blocks[deletedBlock]->add(blocks[deletedBlock-1]->getKey(i),blocks[deletedBlock-1]->getVal(i));
+                blocks[deletedBlock-1]->deleteRecord(blocks[deletedBlock-1]->getKey(i));
+            }else if(i<numOfRecords && i!=0){
+                cout<<"Can't fully split";
             }
         }
     }
@@ -223,8 +243,18 @@ public:
                int key =blocks[i]->getKey(j);
                if(key==iToken){
                    blocks[i]->deleteRecord(iToken);
-                   if(i>1 && blocks[i]->getCurrentNumberOfRecords()<(numberOfBlocks/2)){
-                       combineWithPrevious(i,blocks[i]->getCurrentNumberOfRecords());
+
+                   if(blocks[i]->isEmpty()){
+                       blocks[i-1]->setKey(-1);
+                   }
+
+                   if(i>1 && blocks[i]->islessThanHalf()){
+
+                       if(blocks[i]->getCurrentNumberOfRecords()>blocks[i-1]->getCurrentNumberOfRecords()) {
+                           combineWithPrevious(i, blocks[i]->getCurrentNumberOfRecords());
+                       }else if(blocks[i]->getCurrentNumberOfRecords()<blocks[i-1]->getCurrentNumberOfRecords()){
+                           split(i, blocks[i]->getCurrentNumberOfRecords());
+                       }
                    }
                }
            }

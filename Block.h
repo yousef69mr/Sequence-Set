@@ -7,6 +7,7 @@
 #include <bits/stdc++.h>
 
 
+
 struct Record{
     int iKey;
     int iVal;
@@ -36,6 +37,14 @@ public:
 
     void setKey(int index){
         records[0].iKey=index;
+    }
+
+    int getKey(){
+        return records[0].iKey;
+    }
+
+    int getValue(){
+        return records[0].iVal;
     }
 
     void setValue(int index){
@@ -68,42 +77,20 @@ public:
     int getNumberOfRecords(){
         return numberOfRecords;
     }
-    void swap(Record* af, Record* bf){
 
-        Record t = *af;
-        *af = *bf;
-        *bf = t;
-    }
 
-    void sort(Record* &array){
-
-        int size =sizeof (array)/sizeof (array[0]);
-        for(int i=0;i<size+1;i++){
-            if(array[i].iKey>array[i+1].iKey){
-                swap(&array[i],&array[i+1]);
-            }
-        }
-    }
-
-    void arrSort(int* pDonate[], int s)
-    {
-        bool swap;
-        int* temp;
-        do
-        {
-            swap = false;
-            for (int count = 0; count < (s-1); count++)
-            {
-                if ((*pDonate[count]) > (*pDonate[count+1]))
-                {
-                    temp = pDonate[count];
-                    pDonate[count] = pDonate[count+1];
-                    pDonate[count+1] = temp;
+    void sortArray(Record array[],int size){
+        bool swapped;
+        do{
+            swapped= false;
+            for(int count=0;count<size;count++){
+                if(array[count].iKey>array[count+1].iKey){
+                    swap(array[count],array[count+1]);
+                    swapped= true;
                 }
-                swap = true;
+
             }
-        }
-        while(swap);
+        } while (swapped);
     }
 
     bool isValid(){
@@ -112,6 +99,14 @@ public:
             return false;
         }
         return true;
+    }
+
+    bool isEmpty(){
+        setCurrentNumberOfRecords();
+        if(getCurrentNumberOfRecords()==1){
+            return true;
+        }
+        return false;
     }
 
 
@@ -127,13 +122,14 @@ public:
             if(getNumberOfRecords()>getCurrentNumberOfRecords()){
                 records[getCurrentNumberOfRecords()].iKey=key;
                 records[getCurrentNumberOfRecords()].iVal=value;
-                sort(records);
-                //arrSort(records,numberOfRecords);
+
                 records[0].iVal= records[getCurrentNumberOfRecords()].iKey;
                 cout<<"Added Successfully\n";
             }
 
-            sort(records);
+
+            sortArray(records,getCurrentNumberOfRecords());
+
             records[0].iVal= records[getCurrentNumberOfRecords()].iKey;
         }
     }
@@ -156,11 +152,23 @@ public:
    void deleteRecord(int key){
         for(int i=1;i<numberOfRecords;i++){
             if(records[i].iKey==key){
+                /*
                 if(getCurrentNumberOfRecords()==i){
-                    records[0].iVal=records[i-1].iVal;
+                    records[0].iVal=records[i-1].iKey;
                 }
-                records[i].iKey=NULL;
-                records[i].iVal=NULL;
+*/
+                arrayShifter(records,i,numberOfRecords);
+
+                records[getNumberOfRecords()-1].iKey=NULL;
+                records[getNumberOfRecords()-1].iVal=NULL;
+
+
+                records[0].iVal=getLastKey();
+
+                if(isEmpty()){
+                    records[0].iVal=-1;
+                }
+
                 setCurrentNumberOfRecords();
                 cout<<"Deleted Successfully\n";
             }
@@ -168,6 +176,32 @@ public:
 
     }
 
+    int getLastKey(){
+        for(int i=1;i<numberOfRecords;i++){
+            if(records[i+1].iKey==NULL){
+                return records[i].iKey;
+            }
+        }
+
+        return -1;
+    }
+
+    void arrayShifter(Record array[],int index,int size){
+        for(int i=index;i<size;i++){
+            array[i]=array[i+1];
+        }
+
+    }
+
+    bool islessThanHalf(){
+        setCurrentNumberOfRecords();
+
+        if(getCurrentNumberOfRecords()<=((numberOfRecords)/2)){
+            return true;
+        }
+
+        return false;
+    }
 };
 
 
