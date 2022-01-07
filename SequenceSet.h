@@ -111,7 +111,7 @@ public:
 
     void writeSetToFile(){
 
-        bool end= false;
+        bool end;
         bool endOfSet=false;
 
 
@@ -121,7 +121,6 @@ public:
                 end= true;
                 //cout << "Record Key : " + to_string(blocks[j]->getKey(0)) + " / Record Value : " + to_string(blocks[j]->getVal(0)) << endl;
                 insertToFile(blocks[j]->getKey(0),blocks[j]->getVal(0),end,endOfSet);
-                end=false;
 
 
             }else {
@@ -155,6 +154,12 @@ public:
                 blocks[i]->add(iKey,iToken);
                 blocks[i-1]->setKey(i);
                 blocks[0]->setValue(FirstEmptyBlock());
+                if(i>1 && !blocks[i]->islessThanHalf()){
+
+                    if(blocks[i]->getCurrentNumberOfRecords()<blocks[i-1]->getCurrentNumberOfRecords()){
+                        split(i+1, blocks[i]->getCurrentNumberOfRecords()/2);
+                    }
+                }
                 return i;
             }
         }
@@ -213,9 +218,13 @@ public:
 
     void combineWithPrevious(int deletedBlock,int numOfRecords){
         for(int i=1,j=0;i<numberOfRecordsInEachBlock&&j<numOfRecords;i++,j++) {
-            if (blocks[deletedBlock - 1]->isValid()) {
+            if (blocks[deletedBlock-1]->isValid()&&(!blocks[deletedBlock]->islessThanHalf()||!blocks[deletedBlock]->isEmpty())) {
                 blocks[deletedBlock-1]->add(blocks[deletedBlock]->getKey(i),blocks[deletedBlock]->getVal(i));
                 blocks[deletedBlock]->deleteRecord(blocks[deletedBlock]->getKey(i));
+
+                blocks[deletedBlock-1]->setCurrentNumberOfRecords();
+                blocks[deletedBlock]->setCurrentNumberOfRecords();
+
             }else if(i<numOfRecords && i!=0){
                 cout<<"Can't fully combined";
             }else{
@@ -226,10 +235,24 @@ public:
 
 
     void split(int deletedBlock,int numOfRecords){
-        for(int i=1,j=0;i<numberOfRecordsInEachBlock&&j<numOfRecords;i++,j++) {
-            if (blocks[deletedBlock]->isValid()&&!blocks[deletedBlock-1]->islessThanHalf()) {
+        for(int i=1,j=1;i<numberOfRecordsInEachBlock&&j<numOfRecords;i++,j++) {
+            if (blocks[deletedBlock]->isValid()&&!blocks[deletedBlock-1]->islessThanHalf()&&(blocks[deletedBlock]->islessThanHalf()||blocks[deletedBlock]->isEmpty())) {
+
+                if(blocks[deletedBlock]->isEmpty()){
+                    blocks[deletedBlock-1]->setKey(-1);
+                } else{
+                    blocks[deletedBlock-1]->setKey(deletedBlock);
+                }
+
+
                 blocks[deletedBlock]->add(blocks[deletedBlock-1]->getKey(i),blocks[deletedBlock-1]->getVal(i));
                 blocks[deletedBlock-1]->deleteRecord(blocks[deletedBlock-1]->getKey(i));
+
+                blocks[deletedBlock-1]->setCurrentNumberOfRecords();
+                blocks[deletedBlock]->setCurrentNumberOfRecords();
+
+
+
             }else if(i<numOfRecords && i!=0){
                 cout<<"Can't fully split";
             }
@@ -250,12 +273,25 @@ public:
 
                    if(i>1 && blocks[i]->islessThanHalf()){
 
-                       if(blocks[i]->getCurrentNumberOfRecords()>blocks[i-1]->getCurrentNumberOfRecords()) {
-                           combineWithPrevious(i, blocks[i]->getCurrentNumberOfRecords());
-                       }else if(blocks[i]->getCurrentNumberOfRecords()<blocks[i-1]->getCurrentNumberOfRecords()){
-                           split(i, blocks[i]->getCurrentNumberOfRecords());
+                       if(blocks[i-1]->isValid()&&!blocks[i]->isEmpty()) {
+                           combineWithPrevious(i, blocks[i]->getCurrentNumberOfRecords() / 2);
+                       }else if(!blocks[i-1]->islessThanHalf()&&!blocks[i]->isEmpty()){
+                           split(i, blocks[i-1]->getCurrentNumberOfRecords()/2);
                        }
                    }
+
+                   if(i<numberOfBlocks){
+                       if(!blocks[i+1]->isEmpty() && blocks[i]->isEmpty()) {
+                           blocks[i]->setKey(-1);
+                           blocks[i - 1]->setKey(getIndexOfNonEmptyBlock(i));
+
+                       }else if(!blocks[i+1]->isEmpty()) {
+                           blocks[i]->setKey(getIndexOfNonEmptyBlock(i));
+                       }
+
+                   }
+
+                   blocks[0]->setValue(FirstEmptyBlock());
                }
            }
 
@@ -273,6 +309,16 @@ public:
             }
         }
 
+        return -1;
+    }
+
+
+    int getIndexOfNonEmptyBlock(int start){
+        for(int i=start+1;i<numberOfBlocks;i++){
+            if(!blocks[i]->isEmpty()){
+                return i;
+            }
+        }
         return -1;
     }
 

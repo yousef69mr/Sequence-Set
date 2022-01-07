@@ -9,24 +9,25 @@ int main() {
         int key,value,blockNumber,recordNumber,result;
         bool isRunning=true;
 
-/*
-        set.InsertVal(1,1);
-        set.InsertVal(4,2);
-        set.InsertVal(4,4);
-        set.InsertVal(3,3);
+
+        set.InsertVal(5,1);
+        set.InsertVal(18,4);
+        set.InsertVal(27,5);
+        set.InsertVal(88,2);
 
 
-        set.InsertVal(9,9);
-        set.InsertVal(5,5);
-        set.InsertVal(6,6);
-        set.InsertVal(8,8);
+        set.InsertVal(20,3);
+        set.InsertVal(4,8);
+        set.InsertVal(11,9);
+        set.InsertVal(15,7);
 
-        set.InsertVal(9,10);
-        set.InsertVal(5,11);
-        set.InsertVal(6,12);
-        set.InsertVal(8,14);
+       // set.DeleteKey(7);
+        //set.InsertVal(9,10);
+        //set.InsertVal(5,11);
+        //set.InsertVal(6,12);
+        //set.InsertVal(8,14);
 
-*/
+
         while(isRunning) {
             cout << "//**********************//\n";
             cout<< "Main Menu:\n";

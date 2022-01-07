@@ -125,6 +125,7 @@ public:
 
                 records[0].iVal= records[getCurrentNumberOfRecords()].iKey;
                 cout<<"Added Successfully\n";
+                //setCurrentNumberOfRecords();
             }
 
 
@@ -196,7 +197,7 @@ public:
     bool islessThanHalf(){
         setCurrentNumberOfRecords();
 
-        if(getCurrentNumberOfRecords()<=((numberOfRecords)/2)){
+        if(getCurrentNumberOfRecords()<=((numberOfRecords)/2)&&getCurrentNumberOfRecords()>1){
             return true;
         }
 
