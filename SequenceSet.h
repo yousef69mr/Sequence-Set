@@ -89,7 +89,7 @@ public:
 
 */
 
-    void insertToFile(K key , T element,int endOfBlock,int endOfSet){
+    void insertToFile(K key , T element,bool endOfBlock,bool endOfSet){
         fstream file;
 
         string buffer=to_string(key)+','+to_string(element)+'|';
@@ -158,6 +158,7 @@ public:
 
                     if(blocks[i]->getCurrentNumberOfRecords()<blocks[i-1]->getCurrentNumberOfRecords()){
                         split(i+1, blocks[i]->getCurrentNumberOfRecords()/2);
+                        blocks[0]->setValue(FirstEmptyBlock());
                     }
                 }
                 return i;
@@ -262,7 +263,7 @@ public:
    void DeleteKey(int iToken){
 
        for(int i=1;i<numberOfBlocks;i++){
-           for(int j=0;j<numberOfRecordsInEachBlock;j++){
+           for(int j=1;j<numberOfRecordsInEachBlock;j++){
                int key =blocks[i]->getKey(j);
                if(key==iToken){
                    blocks[i]->deleteRecord(iToken);
@@ -275,8 +276,10 @@ public:
 
                        if(blocks[i-1]->isValid()&&!blocks[i]->isEmpty()) {
                            combineWithPrevious(i, blocks[i]->getCurrentNumberOfRecords() / 2);
+                           blocks[0]->setValue(FirstEmptyBlock());
                        }else if(!blocks[i-1]->islessThanHalf()&&!blocks[i]->isEmpty()){
                            split(i, blocks[i-1]->getCurrentNumberOfRecords()/2);
+                           blocks[0]->setValue(FirstEmptyBlock());
                        }
                    }
 

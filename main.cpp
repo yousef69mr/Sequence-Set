@@ -11,22 +11,31 @@ int main() {
 
 /*
         set.InsertVal(5,1);
+        set.writeSetToFile();
         set.InsertVal(18,4);
+        set.writeSetToFile();
         set.InsertVal(27,5);
+        set.writeSetToFile();
         set.InsertVal(88,2);
+        set.writeSetToFile();
+
 
 
         set.InsertVal(20,3);
+        set.writeSetToFile();
         set.InsertVal(4,8);
+        set.writeSetToFile();
         set.InsertVal(11,9);
+        set.writeSetToFile();
         set.InsertVal(15,7);
-
+        set.writeSetToFile();
+*/
        // set.DeleteKey(7);
         //set.InsertVal(9,10);
         //set.InsertVal(5,11);
         //set.InsertVal(6,12);
         //set.InsertVal(8,14);
-*/
+
 
         while(isRunning) {
             cout << "//**********************//\n";
@@ -59,7 +68,7 @@ int main() {
                     cin >> recordNumber;
                     result = set.getKey(blockNumber, recordNumber);
                     if (result != -1) {
-                        cout << "Key Found :" + to_string(result) << endl;
+                        cout << "Key Found : " + to_string(result) << endl;
                     } else {
                         cout << "Key not Found :(\n";
                     }
@@ -72,7 +81,7 @@ int main() {
                     cin >> recordNumber;
                     result = set.getVal(blockNumber, recordNumber);
                     if (result != -1) {
-                        cout << "Key Found :" + to_string(result) << endl;
+                        cout << "Key Found : " + to_string(result) << endl;
                     } else {
                         cout << "Key not Found :(\n";
                     }
@@ -81,7 +90,7 @@ int main() {
                 case (5):
                     result = set.FirstEmptyBlock();
                     if (result != -1) {
-                        cout << "Block Found :" + to_string(result) << endl;
+                        cout << "Block Found : " + to_string(result) << endl;
                     } else {
                         cout << "There is no empty Block\n";
                     }
@@ -99,7 +108,7 @@ int main() {
                     cin >> key;
                     result = set.GetBlockIndex(key);
                     if (result != -1) {
-                        cout << "Block Index :" + to_string(result) << endl;
+                        cout << "Block Index : " + to_string(result) << endl;
                     } else {
                         cout << "Key not found\n";
                     }
@@ -109,7 +118,7 @@ int main() {
                     cin >> key;
                     result = set.GetRecordIndex(key);
                     if (result != -1) {
-                        cout << "Record Index :" + to_string(result) << endl;
+                        cout << "Record Index : " + to_string(result) << endl;
                     } else {
                         cout << "Key not found\n";
                     }
@@ -127,6 +136,7 @@ int main() {
 
 
     }catch(...){
+        cerr<<"Error happened\n";
         exit(1);
     }
 
